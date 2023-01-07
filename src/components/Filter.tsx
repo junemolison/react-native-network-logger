@@ -14,7 +14,7 @@ const httpMethods = [
   { key: 'PUT', label: 'PUT' },
   { key: 'DELETE', label: 'DELETE' },
   { key: 'PATCH', label: 'PATCH' },
-  { key: '', label: 'All HTTP Statuses' },
+  { key: '', label: 'All HTTP Methods' },
 ];
 const httpStatusCode = [
   { key: 100, label: '100' },
