@@ -165,4 +165,4 @@ const themedStyles = (theme: Theme) =>
     },
   });
 
-export default ResultItem;
+export default React.memo(ResultItem);

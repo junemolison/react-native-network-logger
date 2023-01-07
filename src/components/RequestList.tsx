@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import NetworkRequestInfo from '../NetworkRequestInfo';
 import { useThemedStyles, Theme } from '../theme';
@@ -44,6 +44,22 @@ const RequestList: React.FC<Props> = ({
     setFilteredRequests(filtered);
   }, [requests, searchValue, httpMethod, httpCode]);
 
+  const ListHeaderComponent = useCallback(
+    () => (
+      <Button onPress={onShowMore} style={styles.more}>
+        More
+      </Button>
+    ),
+    [onShowMore, styles]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: NetworkRequestInfo }) => (
+      <ResultItem request={item} onPress={() => onPressItem(item)} />
+    ),
+    [onPressItem]
+  );
+
   return (
     <View style={styles.container}>
       {!showDetails && (
@@ -58,15 +74,9 @@ const RequestList: React.FC<Props> = ({
       <FlashList
         keyExtractor={(item) => item.id}
         estimatedItemSize={110}
-        ListHeaderComponent={() => (
-          <Button onPress={onShowMore} style={styles.more}>
-            More
-          </Button>
-        )}
+        ListHeaderComponent={ListHeaderComponent}
         data={filteredRequests}
-        renderItem={({ item }) => (
-          <ResultItem request={item} onPress={() => onPressItem(item)} />
-        )}
+        renderItem={renderItem}
       />
     </View>
   );
