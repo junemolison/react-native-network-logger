@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import NetworkRequestInfo from '../NetworkRequestInfo';
 import { useThemedStyles, Theme } from '../theme';
 import ResultItem from './ResultItem';
 import Button from './Button';
 import SearchBar from './SearchBar';
 import Filter from './Filter';
+import { FlashList } from '@shopify/flash-list';
 
 interface Props {
   requests: NetworkRequestInfo[];
@@ -23,31 +24,40 @@ const RequestList: React.FC<Props> = ({
   const styles = useThemedStyles(themedStyles);
 
   const [searchValue, onChangeSearchText] = useState('');
+  const [filteredRequests, setFilteredRequests] = useState(requests);
+
   const [httpMethod, onChangeHttpMethods] = useState('');
   const [httpCode, onChangeHttpCode] = useState(0);
-  const filteredRequests = requests.filter((request) => {
-    return (
-      request.url.toLowerCase().includes(searchValue.toLowerCase()) &&
-      request.method.includes(httpMethod) &&
-      request.status.toString().includes(httpCode.toString())
-    );
-  });
+
+  useEffect(() => {
+    const filtered = requests.filter((request) => {
+      const value = searchValue.toLowerCase().trim();
+
+      return (
+        (request.url.toLowerCase().includes(value) ||
+          request.gqlOperation?.toLowerCase().includes(value)) &&
+        request.method.includes(httpMethod) &&
+        request.status.toString().includes(httpCode.toString())
+      );
+    });
+
+    setFilteredRequests(filtered);
+  }, [requests, searchValue, httpMethod, httpCode]);
 
   return (
     <View style={styles.container}>
       {!showDetails && (
-        <SearchBar value={searchValue} onChangeText={onChangeSearchText} />
+        <>
+          <SearchBar value={searchValue} onChangeText={onChangeSearchText} />
+          <Filter
+            onChangeHttpMethods={onChangeHttpMethods}
+            onChangeHttpCode={onChangeHttpCode}
+          />
+        </>
       )}
-      {!showDetails && (
-        <Filter
-          httpMethodValue={httpMethod}
-          httpStatusCodeValue={httpCode}
-          onChangeHttpMethods={onChangeHttpMethods}
-          onChangeHttpCode={onChangeHttpCode}
-        />
-      )}
-      <FlatList
+      <FlashList
         keyExtractor={(item) => item.id}
+        estimatedItemSize={110}
         ListHeaderComponent={() => (
           <Button onPress={onShowMore} style={styles.more}>
             More

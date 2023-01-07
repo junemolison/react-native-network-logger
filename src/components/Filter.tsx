@@ -4,8 +4,6 @@ import { useThemedStyles, useTheme } from '../theme';
 import ModalSelector from 'react-native-modal-selector';
 
 interface Props {
-  httpMethodValue: string;
-  httpStatusCodeValue: number;
   onChangeHttpMethods(text: string): void;
   onChangeHttpCode(text: number): void;
 }
@@ -16,6 +14,7 @@ const httpMethods = [
   { key: 'PUT', label: 'PUT' },
   { key: 'DELETE', label: 'DELETE' },
   { key: 'PATCH', label: 'PATCH' },
+  { key: '', label: 'All HTTP Statuses' },
 ];
 const httpStatusCode = [
   { key: 100, label: '100' },
@@ -28,14 +27,10 @@ const httpStatusCode = [
   { key: 403, label: '403' },
   { key: 500, label: '500' },
   { key: 504, label: '504' },
+  { key: 0, label: 'All HTTP Statuses' },
 ];
 
-const Filter: React.FC<Props> = ({
-  httpMethodValue,
-  httpStatusCodeValue,
-  onChangeHttpMethods,
-  onChangeHttpCode,
-}) => {
+const Filter: React.FC<Props> = ({ onChangeHttpMethods, onChangeHttpCode }) => {
   const styles = useThemedStyles(themedStyles);
   const theme = useTheme();
 
@@ -46,9 +41,8 @@ const Filter: React.FC<Props> = ({
         selectTextStyle={{ color: theme.colors.text }}
         initValueTextStyle={{ color: theme.colors.text }}
         data={httpMethods}
-        initValue="Select HTTP Method"
+        initValue="All HTTP Methods"
         onChange={(option) => onChangeHttpMethods(option.key)}
-        selectedKey={httpMethodValue}
         cancelText="Cancel"
       />
       <ModalSelector
@@ -56,8 +50,7 @@ const Filter: React.FC<Props> = ({
         style={styles.dropDownContainer}
         initValueTextStyle={{ color: theme.colors.text }}
         data={httpStatusCode}
-        initValue="Select HTTP Status"
-        selectedKey={httpStatusCodeValue}
+        initValue="All HTTP Statuses"
         onChange={(option) => onChangeHttpCode(option.key)}
         cancelText="Cancel"
       />
@@ -79,4 +72,4 @@ const themedStyles = () =>
     },
   });
 
-export default Filter;
+export default React.memo(Filter);

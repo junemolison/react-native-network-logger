@@ -119,19 +119,25 @@ describe('getRequestBody', () => {
     expect(typeof result).toBe('string');
     expect(result).toMatchInlineSnapshot(`
       "{
-        \\"data\\": {
-          \\"a\\": 1
+        "data": {
+          "a": 1
         }
       }"
     `);
   });
 
-  it('should return original object as string if stringify fails', () => {
+  it('should return object wrapped in data if parsing fails', () => {
     // @ts-ignore
     info.dataSent = { test: 1 };
     const result = info.getRequestBody();
     expect(typeof result).toBe('string');
-    expect(result).toEqual('[object Object]');
+    expect(result).toMatchInlineSnapshot(`
+      "{
+        "data": {
+          "test": 1
+        }
+      }"
+    `);
   });
 
   it('should process formData', () => {
@@ -147,10 +153,24 @@ describe('getRequestBody', () => {
     expect(typeof result).toBe('string');
     expect(result).toMatchInlineSnapshot(`
       "{
-        \\"test\\": \\"hello\\",
-        \\"another\\": \\"goodbye\\"
+        "test": "hello",
+        "another": "goodbye"
       }"
     `);
+  });
+
+  it('should escape new lines and quotes if escape set to true', () => {
+    info.dataSent =
+      '{"operationName": "Test", "query": "query posts(type=\\"test\\") {\\n  id\\n  name\\n}"}';
+    const result = info.getRequestBody(true);
+    expect(typeof result).toBe('string');
+    expect(result).toEqual(`{
+  "operationName": "Test",
+  "query": "query posts(type="test") {
+  id
+  name
+}"
+}`);
   });
 });
 
@@ -168,18 +188,24 @@ describe('getResponseBody', () => {
     expect(typeof result).toBe('string');
     expect(result).toMatchInlineSnapshot(`
       "{
-        \\"data\\": {
-          \\"a\\": 1
+        "data": {
+          "a": 1
         }
       }"
     `);
   });
 
-  it('should return original object as string if stringify fails', () => {
+  it('should return object wrapped in data if parsing fails', () => {
     // @ts-ignore
     info.dataSent = { test: 1 };
     const result = info.getRequestBody();
     expect(typeof result).toBe('string');
-    expect(result).toEqual('[object Object]');
+    expect(result).toMatchInlineSnapshot(`
+      "{
+        "data": {
+          "test": 1
+        }
+      }"
+    `);
   });
 });

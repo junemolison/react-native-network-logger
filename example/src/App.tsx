@@ -7,11 +7,14 @@ import {
   View,
   Text,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import NetworkLogger, {
   ThemeName,
   getBackHandler,
+  startNetworkLogging,
 } from 'react-native-network-logger';
+import { getRates } from './apolloClient';
 
 export default function App() {
   const formData = new FormData();
@@ -28,17 +31,33 @@ export default function App() {
       method: 'POST',
       body: formData,
     });
+    fetch('https://httpstat.us/200', { method: 'HEAD' });
+    fetch('https://postman-echo.com/put', {
+      method: 'PUT',
+      body: JSON.stringify({ test: 'hello' }),
+    });
     fetch('https://httpstat.us/302');
     fetch('https://httpstat.us/400');
     fetch('https://httpstat.us/500');
     // Non JSON response
     fetch('https://postman-echo.com/stream/2');
+
+    getRates();
     // Test requests that fail
     // fetch('https://failingrequest');
   };
-  const [theme, setTheme] = useState<ThemeName>('dark');
 
-  const styles = themedStyles(theme === 'dark');
+  startNetworkLogging({
+    ignoredHosts: ['192.168.1.28', '127.0.0.1'],
+    maxRequests: 500,
+    ignoredUrls: ['https://httpstat.us/other'],
+    ignoredPatterns: [/^POST http:\/\/(192|10)/],
+  });
+
+  const [theme, setTheme] = useState<ThemeName>('dark');
+  const isDark = theme === 'dark';
+
+  const styles = themedStyles(isDark);
 
   const goBack = () => setUnmountNetworkLogger(true);
 
@@ -51,14 +70,13 @@ export default function App() {
       <Button
         title={'Re-open the network logger'}
         onPress={() => setUnmountNetworkLogger(false)}
-      >
-        Re-open network logger
-      </Button>
+      />
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.navButton}

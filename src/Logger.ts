@@ -1,6 +1,9 @@
 import XHRInterceptor from 'react-native/Libraries/Network/XHRInterceptor';
 import NetworkRequestInfo from './NetworkRequestInfo';
 import { Headers, RequestMethod, StartNetworkLoggingOptions } from './types';
+import extractHost from './utils/extractHost';
+import { warn } from './utils/logger';
+
 let nextXHRId = 0;
 
 type XHR = {
@@ -12,6 +15,10 @@ export default class Logger {
   private requests: NetworkRequestInfo[] = [];
   private xhrIdMap: { [key: number]: number } = {};
   private maxRequests: number = 500;
+  private ignoredHosts: Set<string> | undefined;
+  private ignoredUrls: Set<string> | undefined;
+  private ignoredPatterns: RegExp[] | undefined;
+  public enabled = false;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   callback = (requests: any[]) => {};
@@ -32,13 +39,32 @@ export default class Logger {
   ) => {
     const networkInfo = this.getRequest(index);
     if (!networkInfo) return;
-    Object.assign(networkInfo, update);
+    networkInfo.update(update);
   };
 
   private openCallback = (method: RequestMethod, url: string, xhr: XHR) => {
     xhr._index = nextXHRId++;
     const xhrIndex = this.requests.length;
     this.xhrIdMap[xhr._index] = xhrIndex;
+
+    if (this.ignoredHosts) {
+      const host = extractHost(url);
+      if (host && this.ignoredHosts.has(host)) {
+        return;
+      }
+    }
+
+    if (this.ignoredUrls && this.ignoredUrls.has(url)) {
+      return;
+    }
+
+    if (this.ignoredPatterns) {
+      if (
+        this.ignoredPatterns.some((pattern) => pattern.test(`${method} ${url}`))
+      ) {
+        return;
+      }
+    }
 
     const newRequest = new NetworkRequestInfo(
       `${nextXHRId}`,
@@ -105,18 +131,56 @@ export default class Logger {
   };
 
   enableXHRInterception = (options?: StartNetworkLoggingOptions) => {
-    if (XHRInterceptor.isInterceptorEnabled()) {
+    if (
+      this.enabled ||
+      (XHRInterceptor.isInterceptorEnabled() && !options?.forceEnable)
+    ) {
+      if (!this.enabled) {
+        warn(
+          'network interceptor has not been enabled as another interceptor is already running (e.g. another debugging program). Use option `forceEnable: true` to override this behaviour.'
+        );
+      }
       return;
     }
 
     if (options?.maxRequests !== undefined) {
       if (typeof options.maxRequests !== 'number' || options.maxRequests < 1) {
-        console.warn(
-          'react-native-network-logger: maxRequests must be a number greater than 0. The logger has not been started.'
+        warn(
+          'maxRequests must be a number greater than 0. The logger has not been started.'
         );
         return;
       }
       this.maxRequests = options.maxRequests;
+    }
+
+    if (options?.ignoredHosts) {
+      if (
+        !Array.isArray(options.ignoredHosts) ||
+        typeof options.ignoredHosts[0] !== 'string'
+      ) {
+        warn(
+          'ignoredHosts must be an array of strings. The logger has not been started.'
+        );
+        return;
+      }
+      this.ignoredHosts = new Set(options.ignoredHosts);
+    }
+
+    if (options?.ignoredPatterns) {
+      this.ignoredPatterns = options.ignoredPatterns;
+    }
+
+    if (options?.ignoredUrls) {
+      if (
+        !Array.isArray(options.ignoredUrls) ||
+        typeof options.ignoredUrls[0] !== 'string'
+      ) {
+        warn(
+          'ignoredUrls must be an array of strings. The logger has not been started.'
+        );
+        return;
+      }
+      this.ignoredUrls = new Set(options.ignoredUrls);
     }
 
     XHRInterceptor.setOpenCallback(this.openCallback);
@@ -126,6 +190,7 @@ export default class Logger {
     XHRInterceptor.setResponseCallback(this.responseCallback);
 
     XHRInterceptor.enableInterception();
+    this.enabled = true;
   };
 
   getRequests = () => {

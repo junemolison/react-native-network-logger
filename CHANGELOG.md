@@ -1,3 +1,54 @@
+
+
+# [1.14.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.13.0...v1.14.0) (2023-01-05)
+
+
+### Features
+
+* Add options to ignore specific urls and regex  patterns ([#70](https://github.com/alexbrazier/react-native-network-logger/issues/70)) ([5ee6c3e](https://github.com/alexbrazier/react-native-network-logger/commit/5ee6c3e84408d7338e5549e14a5f25d184cc1dee))
+
+# [1.13.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.12.0...v1.13.0) (2022-08-20)
+
+
+### Features
+
+* Add option to export all logs as HAR ([#36](https://github.com/alexbrazier/react-native-network-logger/issues/36)) ([c3b7dda](https://github.com/alexbrazier/react-native-network-logger/commit/c3b7ddaf56f2714dab07d2b8094b38faf674c1d9))
+
+# [1.12.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.11.0...v1.12.0) (2021-11-02)
+
+
+### Features
+
+* Add ability to set custom theme ([#60](https://github.com/alexbrazier/react-native-network-logger/issues/60)) ([75598c0](https://github.com/alexbrazier/react-native-network-logger/commit/75598c03e55f3525c58b5bbc945496918e135494))
+
+# [1.11.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.10.1...v1.11.0) (2021-08-24)
+
+
+### Features
+
+* Warn if the logger doesn't start due to duplicate logger ([#56](https://github.com/alexbrazier/react-native-network-logger/issues/56)) ([35b54e0](https://github.com/alexbrazier/react-native-network-logger/commit/35b54e08c33e4a32ff61d253fecd82697abbca69))
+
+## [1.10.1](https://github.com/alexbrazier/react-native-network-logger/compare/v1.10.0...v1.10.1) (2021-07-29)
+
+
+### Bug Fixes
+
+* Disable the logger if used on a web project ([#53](https://github.com/alexbrazier/react-native-network-logger/issues/53)) ([800c948](https://github.com/alexbrazier/react-native-network-logger/commit/800c94872219922c35a633fa53046fd43a29a09b))
+
+# [1.10.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.9.0...v1.10.0) (2021-06-27)
+
+
+### Features
+
+* Add basic support for GraphQL ([#49](https://github.com/alexbrazier/react-native-network-logger/issues/49)) ([6c11bb2](https://github.com/alexbrazier/react-native-network-logger/commit/6c11bb2b7b887fa75aead0fde44523aced84d62b))
+
+# [1.9.0](https://github.com/alexbrazier/react-native-network-logger/compare/v1.8.1...v1.9.0) (2021-05-06)
+
+
+### Features
+
+* Add `ignoredHosts` option to ignore specified hosts ([#47](https://github.com/alexbrazier/react-native-network-logger/issues/47)) ([8eb6dd6](https://github.com/alexbrazier/react-native-network-logger/commit/8eb6dd6c2d953d5bb1f92bab9eac8a1f289af39b))
+
 ## [1.8.1](https://github.com/alexbrazier/react-native-network-logger/compare/v1.8.0...v1.8.1) (2020-11-04)
 
 
@@ -144,4 +195,3 @@
 
 
 ## [1.0.1](https://github.com/alexbrazier/react-native-network-logger/compare/v1.0.3...v1.1.0) (2020-06-19)
-

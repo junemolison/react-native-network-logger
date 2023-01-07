@@ -54,4 +54,4 @@ const themedStyles = (theme: Theme) =>
     },
   });
 
-export default SearchBar;
+export default React.memo(SearchBar);
