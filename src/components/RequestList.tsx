@@ -7,30 +7,31 @@ import Button from './Button';
 import SearchBar from './SearchBar';
 import Filter from './Filter';
 import { FlashList } from '@shopify/flash-list';
+import { NetworkRequestInfoRow } from 'src/types';
 
 interface Props {
-  requests: NetworkRequestInfo[];
-  onPressItem: (item: NetworkRequestInfo) => void;
-  onShowMore: () => void;
+  requestsInfo: NetworkRequestInfoRow[];
+  onPressItem: (item: NetworkRequestInfo['id']) => void;
+  options: { text: string; onPress: () => void }[];
   showDetails: boolean;
 }
 
 const RequestList: React.FC<Props> = ({
-  requests,
+  requestsInfo,
   onPressItem,
-  onShowMore,
+  options,
   showDetails,
 }) => {
   const styles = useThemedStyles(themedStyles);
 
   const [searchValue, onChangeSearchText] = useState('');
-  const [filteredRequests, setFilteredRequests] = useState(requests);
+  const [filteredRequests, setFilteredRequests] = useState(requestsInfo);
 
   const [httpMethod, onChangeHttpMethods] = useState('');
   const [httpCode, onChangeHttpCode] = useState(0);
 
   useEffect(() => {
-    const filtered = requests.filter((request) => {
+    const filtered = requestsInfo.filter((request) => {
       const value = searchValue.toLowerCase().trim();
 
       return (
@@ -42,20 +43,12 @@ const RequestList: React.FC<Props> = ({
     });
 
     setFilteredRequests(filtered);
-  }, [requests, searchValue, httpMethod, httpCode]);
+  }, [requestsInfo, searchValue, httpMethod, httpCode]);
 
-  const ListHeaderComponent = useCallback(
-    () => (
-      <Button onPress={onShowMore} style={styles.more}>
-        More
-      </Button>
-    ),
-    [onShowMore, styles]
-  );
 
   const renderItem = useCallback(
-    ({ item }: { item: NetworkRequestInfo }) => (
-      <ResultItem request={item} onPress={() => onPressItem(item)} />
+    ({ item }: { item: NetworkRequestInfoRow }) => (
+      <ResultItem request={item} onPress={() => onPressItem(item.id)} />
     ),
     [onPressItem]
   );
@@ -64,7 +57,11 @@ const RequestList: React.FC<Props> = ({
     <View style={styles.container}>
       {!showDetails && (
         <>
-          <SearchBar value={searchValue} onChangeText={onChangeSearchText} />
+          <SearchBar
+            value={searchValue}
+            onChangeText={onChangeSearchText}
+            options={options}
+          />
           <Filter
             onChangeHttpMethods={onChangeHttpMethods}
             onChangeHttpCode={onChangeHttpCode}
@@ -74,7 +71,6 @@ const RequestList: React.FC<Props> = ({
       <FlashList
         keyExtractor={(item) => item.id}
         estimatedItemSize={110}
-        ListHeaderComponent={ListHeaderComponent}
         data={filteredRequests}
         renderItem={renderItem}
       />
